@@ -10,7 +10,7 @@ Start off by cloning this project and then change into that directory
 
 ```bash
 
-git clone https://github.com/davidthorn/webpack-typescript.git <project_name>
+git clone https://github.com/davidthorn/digital-clock-api.git <project_name>
 cd <project_name>
 
 ```

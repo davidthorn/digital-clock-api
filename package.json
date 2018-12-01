@@ -1,7 +1,7 @@
 {
-  "name": "webpack-typescript",
+  "name": "digital-clock-api",
   "version": "1.0.0",
-  "description": "A skeleton project to be used to create typescript project using npm and webpack",
+  "description": "A project which highlights how I would implement an api for a digital clock in typescript",
   "main": "src/main.ts",
   "dependencies": {},
   "devDependencies": {
@@ -12,16 +12,16 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build" : "webpack && cp -r assets/* dist && tsc"
+    "build": "webpack && cp -r assets/* dist && tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidthorn/webpack-typescript.git"
+    "url": "git+https://github.com/davidthorn/digital-clock-api.git"
   },
   "author": "David Thorn",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/davidthorn/webpack-typescript/issues"
+    "url": "https://github.com/davidthorn/digital-clock-api/issues"
   },
-  "homepage": "https://github.com/davidthorn/webpack-typescript#readme"
+  "homepage": "https://github.com/davidthorn/digital-clock-api#readme"
 }
