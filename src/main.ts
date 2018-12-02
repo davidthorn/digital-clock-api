@@ -15,16 +15,22 @@ Window.prototype.clock = ((): DigitalClock =>  {
 
 Window.prototype.draw = () => {
 
-    const container = document.getElementById('digital-clock') 
+    const container_hours = document.getElementById('digital-clock-hours') 
+    const container_minutes = document.getElementById('digital-clock-minutes') 
+    const container_seconds = document.getElementById('digital-clock-seconds') 
     
-    if(container === null) {
+    if(container_hours === null || container_minutes === null || container_seconds === null ) {
         throw new Error('container cannot be undefined')
     }
     
-    const canvas = new DigitalClockCanvas(container)
+    const hours = new DigitalClockCanvas(container_hours)
+    const minutes = new DigitalClockCanvas(container_minutes)
+    const seconds = new DigitalClockCanvas(container_seconds)
 
     window.clock.onTimeFormChanged((c, t) => {
-        canvas.draw(t.seconds)
+        hours.draw(t.hours)
+        minutes.draw(t.minutes)
+        seconds.draw(t.seconds)
         console.log(c.convertSecondsToTimeFormat(c.totalSeconds))
     })
 
