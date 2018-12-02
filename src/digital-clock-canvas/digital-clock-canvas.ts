@@ -10,6 +10,8 @@ export class DigitalClockCanvas {
 
     frame: DOMRect
 
+    digits: number[] = []
+
     constructor(container: HTMLElement) {
         this.container = container
         this.canvas = document.createElement('canvas') as HTMLCanvasElement
@@ -26,14 +28,36 @@ export class DigitalClockCanvas {
      * @param {TimeFormat} time
      * @memberof DigitalClockCanvas
      */
-    draw(digit: number )  {
+    draw( )  {
+        const ctx = this.context
+        const f = this.container.getBoundingClientRect()
+        ctx.clearRect(0,0,f.width , f.height)
+        ctx.fillStyle = '#111111'
+        ctx.fillRect(0,0, f.width, f.height)
 
-        const x = this.context
-        const f = this.frame
-        x.clearRect(0,0,f.width , f.height)
+        const cols = f.width / 10
+        const rows = f.height / 20
 
-        x.fillStyle = '#111111'
-        x.fillRect(0,0, f.width, f.height)
+        for(let x = 0; x < cols; x++) {
+            ctx.moveTo(x * cols, 0)
+            ctx.lineWidth = 1
+            ctx.strokeStyle = 'white'
+            ctx.lineTo(x * cols , f.height)
+            ctx.stroke()
+        }
+
+        for(let y = 0; y < rows; y++) {
+            ctx.moveTo(0, y * rows)
+            ctx.lineWidth = 1
+            ctx.strokeStyle = 'white'
+            ctx.lineTo(f.width , y * rows)
+            ctx.stroke()
+        }
+
+        
+        
+
+        
     }
 
 }

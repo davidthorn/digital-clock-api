@@ -15,6 +15,7 @@ Window.prototype.clock = ((): DigitalClock =>  {
 
 Window.prototype.draw = () => {
 
+   
     const container_hours = document.getElementById('digital-clock-hours') 
     const container_minutes = document.getElementById('digital-clock-minutes') 
     const container_seconds = document.getElementById('digital-clock-seconds') 
@@ -28,17 +29,15 @@ Window.prototype.draw = () => {
     const seconds = new DigitalClockCanvas(container_seconds)
 
     window.clock.onTimeFormChanged((c, t) => {
-        hours.draw(t.hours)
-        minutes.draw(t.minutes)
-        seconds.draw(t.seconds)
+        hours.draw()
         console.log(c.convertSecondsToTimeFormat(c.totalSeconds))
     })
 
-    window.clock.startTimer({
-        seconds: 100, 
-        minutes: 0,
-        hours: 0
-    })
+     window.clock.startTimer({
+         seconds: 100, 
+         minutes: 0,
+         hours: 0
+     })
 
 
 }

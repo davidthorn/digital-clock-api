@@ -108,15 +108,14 @@ export class DigitalClock implements StopWatch {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined')
         }
         this.totalSeconds = this.getTotalSecondsOfTimeFormat(time)
-        this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this)
+        //this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this)
+        this.time = time
+        this.isRunning = true
+        this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this))
 
         if(this.handle === undefined) {
             throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred')
         }
-
-        this.time = time
-        this.isRunning = true
-
 
         return this.handle
     }
@@ -157,7 +156,8 @@ export class DigitalClock implements StopWatch {
             throw new Error('The interval must be running for it to be stoppped')
         }
 
-        clearInterval(this.handle)
+        cancelAnimationFrame(this.handle)
+        //clearInterval(this.handle)
         this.handle = undefined
     }
 
@@ -215,17 +215,36 @@ export class DigitalClock implements StopWatch {
         return (((timeFormat.hours * 60) + timeFormat.minutes) * 60) + timeFormat.seconds
     }
 
+    private frames: number = 0
+    private lastFrame: number = Date.now()
+
     /**
      * Handler for the setInterval call which will be used as the interval for the stop watch
      *
-     * @param {StopWatch} stopWatch
      * @memberof StopWatch
      */
-    stopWatchIntervalHandler(stopWatch: StopWatch ): void {
-        stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval()
-        stopWatch.onTimeFormatChangedHanders.forEach(handler =>  {
-            handler(stopWatch, stopWatch.time)
+    stopWatchIntervalHandler( ): void {
+        if(this.frames < 60) {
+            this.frames++
+            if(this.handle) {
+                this.clearInterval()
+            }
+            
+            this.lastFrame = Date.now()
+            this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this))
+            return
+        }
+        this.frames = 0
+        this.running() ? this.decrementSeconds() : this.clearInterval()
+        this.onTimeFormatChangedHanders.forEach(handler =>  {
+            handler(this, this.time)
         })
+        if(this.handle) {
+            this.clearInterval()
+        }
+        
+        this.lastFrame = Date.now()
+        this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this))
     }
 
     onTimeFormChanged(handler: TypeFormChangeHandler): void {
