@@ -17,32 +17,29 @@ Window.prototype.draw = () => {
 
    
     const container_hours = document.getElementById('digital-clock-hours') 
-    const container_minutes = document.getElementById('digital-clock-minutes') 
-    const container_seconds = document.getElementById('digital-clock-seconds') 
     
-    if(container_hours === null || container_minutes === null || container_seconds === null ) {
+    if(container_hours === null  ) {
         throw new Error('container cannot be undefined')
     }
     
     const hours = new DigitalClockCanvas(container_hours)
-    const minutes = new DigitalClockCanvas(container_minutes)
-    const seconds = new DigitalClockCanvas(container_seconds)
-
+  
     window.clock.onTimeFormChanged((c, t) => {
-        hours.draw()
+        hours.draw(c.convertSecondsToTimeFormat(c.totalSeconds))
         console.log(c.convertSecondsToTimeFormat(c.totalSeconds))
     })
 
-     window.clock.startTimer({
-         seconds: 100, 
-         minutes: 0,
-         hours: 0
-     })
+    window.clock.countDownFromDate(new Date(Date.now() + 7200000))
 
 
 }
 
 window.onload = () => {
+    window.draw()
+}
+
+window.onresize = () => {
+    window.clock.clearInterval()
     window.draw()
 }
 

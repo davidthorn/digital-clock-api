@@ -170,10 +170,10 @@ export class DigitalClock implements StopWatch {
      * @memberof StopWatch
      */
     convertSecondsToTimeFormat(totalSeconds: number ): TimeFormat {
-        let seconds = totalSeconds % 60 // gives the remaining seconds
-        let totalMinutes = (totalSeconds - seconds) / 60  // gives the total number of minutes
-        let minutes = totalMinutes % 60 // gives the remaining number of minutes
-        let hours = (totalMinutes - minutes) / 60 // calculates the number of hours 
+        let seconds = Math.ceil(totalSeconds % 60) // gives the remaining seconds
+        let totalMinutes = Math.ceil((totalSeconds - seconds) / 60)  // gives the total number of minutes
+        let minutes = Math.ceil(totalMinutes % 60) // gives the remaining number of minutes
+        let hours = Math.ceil((totalMinutes - minutes) / 60) // calculates the number of hours 
         return {
             seconds,
             minutes,

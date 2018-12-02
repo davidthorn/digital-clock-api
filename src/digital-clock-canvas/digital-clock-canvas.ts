@@ -4,9 +4,9 @@ export class DigitalClockCanvas {
 
     container: HTMLElement
 
-    canvas: HTMLCanvasElement
+    // canvas: HTMLCanvasElement
 
-    context: CanvasRenderingContext2D
+    // context: CanvasRenderingContext2D
 
     frame: DOMRect
 
@@ -14,12 +14,11 @@ export class DigitalClockCanvas {
 
     constructor(container: HTMLElement) {
         this.container = container
-        this.canvas = document.createElement('canvas') as HTMLCanvasElement
-        this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
-        this.container.appendChild(this.canvas)
+    //    this.container.setAttribute('style' ,`width: ${(document.body.clientWidth / 2).toString()}`)
+    //    this.container.setAttribute('style' ,`height: ${(document.body.clientHeight / 6).toString()}`)
+        
+        
         this.frame = this.container.getBoundingClientRect() as DOMRect
-        this.canvas.width = this.frame.width
-        this.canvas.height = this.frame.height
     }
 
     /**
@@ -28,35 +27,21 @@ export class DigitalClockCanvas {
      * @param {TimeFormat} time
      * @memberof DigitalClockCanvas
      */
-    draw( )  {
-        const ctx = this.context
-        const f = this.container.getBoundingClientRect()
-        ctx.clearRect(0,0,f.width , f.height)
-        ctx.fillStyle = '#111111'
-        ctx.fillRect(0,0, f.width, f.height)
+    draw(time: TimeFormat )  {
 
-        const cols = f.width / 10
-        const rows = f.height / 20
+        const h = window.innerHeight
+        const w = window.innerWidth
 
-        for(let x = 0; x < cols; x++) {
-            ctx.moveTo(x * cols, 0)
-            ctx.lineWidth = 1
-            ctx.strokeStyle = 'white'
-            ctx.lineTo(x * cols , f.height)
-            ctx.stroke()
-        }
+        const height = (h / 4.5) + 60
+        const width = (w / 1.5) + 60
+        const marginLeft = (w - width) / 2
+        const marginTop = (h - height) / 2
 
-        for(let y = 0; y < rows; y++) {
-            ctx.moveTo(0, y * rows)
-            ctx.lineWidth = 1
-            ctx.strokeStyle = 'white'
-            ctx.lineTo(f.width , y * rows)
-            ctx.stroke()
-        }
-
-        
-        
-
+        let hours = time.hours < 10 ? `0${time.hours}` : `${time.hours}`
+        let minutes = time.minutes < 10 ? `0${time.minutes}` : `${time.minutes}`
+        let seconds = time.seconds < 10 ? `0${time.seconds}` : `${time.seconds}`
+        this.container.setAttribute('style' , `margin-top: ${marginTop}px; margin-left: ${marginLeft}px; height: ${height.toString()}px; width: ${width.toString()}px; font-size: ${width / 5}px;line-height:${height}px; `)
+        this.container.innerHTML = `${hours}:${minutes}:${seconds}`
         
     }
 
