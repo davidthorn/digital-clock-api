@@ -1,4 +1,9 @@
+import { StopWatch, TimeFormat, StopWatchHandle, TypeFormChangeHandler } from './index'
+export * from './index'
+
 export class DigitalClock implements StopWatch {
+
+    onTimeFormatChangedHanders: TypeFormChangeHandler[] = []
 
     /**
      * The time format representing the total number of seconds, minutes, hours
@@ -99,7 +104,7 @@ export class DigitalClock implements StopWatch {
      */
     startTimer(time: TimeFormat): StopWatchHandle {
         
-        if(this.handle === undefined) {
+        if(this.handle !== undefined) {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined')
         }
 
@@ -108,6 +113,10 @@ export class DigitalClock implements StopWatch {
         if(this.handle === undefined) {
             throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred')
         }
+
+        this.time = time
+        this.isRunning = true
+
         return this.handle
     }
 
@@ -123,8 +132,16 @@ export class DigitalClock implements StopWatch {
      * @returns {TimeFormat}
      * @memberof StopWatch
      */
-    stopTimer(): TimeFormat{
-        throw new Error('Not yet implemented')
+    stopTimer(): TimeFormat {
+
+        if(!this.running()) {
+            throw new Error('The time must be running to stop it')
+        }
+        
+        this.clearInterval()
+        this.isRunning = false
+        
+        return this.time
     }
 
      /**
@@ -151,8 +168,16 @@ export class DigitalClock implements StopWatch {
      * @returns {TimeFormat}
      * @memberof StopWatch
      */
-    convertSecondsToTimeFormat(totalSeconds: number ): TimeFormat{
-        throw new Error('Not yet implemented')
+    convertSecondsToTimeFormat(totalSeconds: number ): TimeFormat {
+        let seconds = totalSeconds % 60 // gives the remaining seconds
+        let totalMinutes = (totalSeconds - seconds) / 60  // gives the total number of minutes
+        let minutes = totalMinutes % 60 // gives the remaining number of minutes
+        let hours = (totalMinutes - minutes) / 60 // calculates the number of hours 
+        return {
+            seconds,
+            minutes,
+            hours
+        }
     }
 
     /**
@@ -166,8 +191,15 @@ export class DigitalClock implements StopWatch {
      * @returns {StopWatch} StopWatch
      * @memberof StopWatch
      */
-    countDownFromDate(dateInFuture: Date): StopWatchHandle{
-        throw new Error('Not yet implemented')
+    countDownFromDate(dateInFuture: Date): StopWatchHandle {
+        let diffInTime = dateInFuture.getTime() - Date.now()
+        if(diffInTime <= 0) {
+            throw new Error('The date provided requires to be in the future of the current time')
+        }
+
+        this.totalSeconds = diffInTime / 1000
+        const diffTime = this.convertSecondsToTimeFormat(this.totalSeconds)
+        return this.startTimer(diffTime)
     }
 
     /**
@@ -179,7 +211,7 @@ export class DigitalClock implements StopWatch {
      * @memberof StopWatch
      */
     getTotalSecondsOfTimeFormat(timeFormat: TimeFormat): number{
-        throw new Error('Not yet implemented')
+        return (((timeFormat.hours * 60) + timeFormat.minutes) * 60) + timeFormat.seconds
     }
 
     /**
@@ -190,52 +222,13 @@ export class DigitalClock implements StopWatch {
      */
     stopWatchIntervalHandler(stopWatch: StopWatch ): void {
         stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval()
+        this.onTimeFormatChangedHanders.forEach(handler =>  {
+            handler(stopWatch, stopWatch.time)
+        })
     }
+
+    onTimeFormChanged(handler: TypeFormChangeHandler): void {
+        this.onTimeFormatChangedHanders.push(handler)
+    }
+
 }
-
-// /**
-//  * Converts the time in seconds to a TimeFormat type
-//  * If the isSeconds is false then it is assumed that they
-//  * are milliseconds and then converted to seconds
-//  *
-//  * @param {number} time
-//  * @param {boolean} [isSeconds=true]
-//  * @returns {TimeFormat}
-//  */
-// function convertTime(time: number, isSeconds: boolean = true): TimeFormat {
-//     time  = !time ? time / 1000 : time
-//     let seconds = time % 60
-//     let totalMinutes = (time - seconds) / 60
-//     let minutes = totalMinutes % 60
-//     let hours = (totalMinutes - minutes) / 60
-//     return {
-//         seconds,
-//         minutes,
-//         hours
-//     }
-// }
-
-// function startStopWatch(seconds: number, minutes: number, hours: number) {
-//     let totalSeconds: number = (((hours * 60) + minutes) * 60) + seconds
-//     let handle = setInterval(() => {
-//         if (totalSeconds > 0) {
-//         let time = convertTime(--totalSeconds)
-//             console.log(time)
-//         } else {
-//             clearInterval(handle)
-//         }
-        
-    
-//     }, 1000)
-// }
-
-// function startCountDownToTime(min: number, hour: number, day: number, month: number, year: number) {
-//     let now = new Date()
-//     now.setUTCMinutes(min)
-//     now.setUTCHours(hour)
-//     now.setUTCFullYear(year , month, day)
-//     let offset = now.getTimezoneOffset() * 60 * 1000
-//     let d = convertTime(Math.ceil((now.getTime() -  (new Date().getTime()) + offset) / 1000)) 
-//     console.log(d)
-//     startStopWatch(d.seconds, d.minutes, d.hours)
-// }

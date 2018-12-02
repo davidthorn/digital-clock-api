@@ -1,6 +1,22 @@
-type StopWatchHandle = number | undefined
+import { DigitalClock } from "./digital-clock-api";
 
-interface StopWatch {
+export interface DigitalClockProject {
+    draw(): void
+}
+
+
+export interface Window {
+    project: DigitalClockProject 
+}
+
+
+export type StopWatchHandle = number | undefined
+
+export type TypeFormChangeHandler = (clock: DigitalClock ,  timeFormat: TimeFormat) => void 
+
+export interface StopWatch {
+
+    onTimeFormatChangedHanders: TypeFormChangeHandler[]
 
     /**
      * The time format representing the total number of seconds, minutes, hours
@@ -143,6 +159,8 @@ interface StopWatch {
      * @memberof StopWatch
      */
     stopWatchIntervalHandler(stopWatch: StopWatch ): void
+
+    onTimeFormChanged(handler: TypeFormChangeHandler): void
 }
 
 type TimeFormat = {

@@ -1,7 +1,8 @@
 "use strict";
-exports.__esModule = true;
-var DigitalClock = /** @class */ (function () {
-    function DigitalClock(timeFormat) {
+Object.defineProperty(exports, "__esModule", { value: true });
+class DigitalClock {
+    constructor(timeFormat) {
+        this.onTimeFormatChangedHanders = [];
         /**
          * The time format representing the total number of seconds, minutes, hours
          * which have either passed if not a timer or are remaining if is a timer
@@ -61,9 +62,12 @@ var DigitalClock = /** @class */ (function () {
      * @returns {number}
      * @memberof StopWatch
      */
-    DigitalClock.prototype.decrementSeconds = function () {
+    decrementSeconds() {
+        if (this.totalSeconds === 0) {
+            throw new Error(`Totals seconds is 0, cannot decrement 0`);
+        }
         return --this.totalSeconds;
-    };
+    }
     /**
      * Indicates if the stop watch / timer is running
      * Returns true if totalSeconds is more than 0 and false otherwise
@@ -71,9 +75,9 @@ var DigitalClock = /** @class */ (function () {
      * @returns {boolean}
      * @memberof StopWatch
      */
-    DigitalClock.prototype.running = function () {
+    running() {
         return this.totalSeconds > 0;
-    };
+    }
     /**
      * Should set the isTimer property to true
      * and set the time property to hold the time value
@@ -86,16 +90,18 @@ var DigitalClock = /** @class */ (function () {
      * @returns {StopWatchHandle}
      * @memberof StopWatch
      */
-    DigitalClock.prototype.startTimer = function (time) {
-        if (this.handle === undefined) {
+    startTimer(time) {
+        if (this.handle !== undefined) {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined');
         }
         this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this);
         if (this.handle === undefined) {
             throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred');
         }
+        this.time = time;
+        this.isRunning = true;
         return this.handle;
-    };
+    }
     /**
      * Should stop the timer from running
      * Sets the isRunning to false
@@ -108,9 +114,14 @@ var DigitalClock = /** @class */ (function () {
      * @returns {TimeFormat}
      * @memberof StopWatch
      */
-    DigitalClock.prototype.stopTimer = function () {
-        throw new Error('Not yet implemented');
-    };
+    stopTimer() {
+        if (!this.running()) {
+            throw new Error('The time must be running to stop it');
+        }
+        this.clearInterval();
+        this.isRunning = false;
+        return this.time;
+    }
     /**
     * Should stop the interval running if it is already running
     * This method will throw an error if the interval is not running
@@ -118,13 +129,13 @@ var DigitalClock = /** @class */ (function () {
     *
     * @memberof StopWatch
     */
-    DigitalClock.prototype.clearInterval = function () {
+    clearInterval() {
         if (this.handle === undefined) {
             throw new Error('The interval must be running for it to be stoppped');
         }
         clearInterval(this.handle);
         this.handle = undefined;
-    };
+    }
     /**
      * Converts the total number of seconds provided into a TimeFormat
      * Indicating how many seconds, minutes and hours this time in seconds is
@@ -133,9 +144,17 @@ var DigitalClock = /** @class */ (function () {
      * @returns {TimeFormat}
      * @memberof StopWatch
      */
-    DigitalClock.prototype.convertSecondsToTimeFormat = function (totalSeconds) {
-        throw new Error('Not yet implemented');
-    };
+    convertSecondsToTimeFormat(totalSeconds) {
+        let seconds = totalSeconds % 60; // gives the remaining seconds
+        let totalMinutes = (totalSeconds - seconds) / 60; // gives the total number of minutes
+        let minutes = totalMinutes % 60; // gives the remaining number of minutes
+        let hours = (totalMinutes - minutes) / 60; // calculates the number of hours 
+        return {
+            seconds,
+            minutes,
+            hours
+        };
+    }
     /**
      * Starts the stop watch counting down from the date in the future
      * This method uses the timer once again it just calculates how many total seconds
@@ -147,9 +166,15 @@ var DigitalClock = /** @class */ (function () {
      * @returns {StopWatch} StopWatch
      * @memberof StopWatch
      */
-    DigitalClock.prototype.countDownFromDate = function (dateInFuture) {
-        throw new Error('Not yet implemented');
-    };
+    countDownFromDate(dateInFuture) {
+        let diffInTime = dateInFuture.getTime() - Date.now();
+        if (diffInTime <= 0) {
+            throw new Error('The date provided requires to be in the future of the current time');
+        }
+        this.totalSeconds = diffInTime / 1000;
+        const diffTime = this.convertSecondsToTimeFormat(this.totalSeconds);
+        return this.startTimer(diffTime);
+    }
     /**
      * Calculates the total number of seconds in this time format
      * This method will throw and error if either of the time format values are negative
@@ -158,60 +183,23 @@ var DigitalClock = /** @class */ (function () {
      * @returns {number} number
      * @memberof StopWatch
      */
-    DigitalClock.prototype.getTotalSecondsOfTimeFormat = function (timeFormat) {
-        throw new Error('Not yet implemented');
-    };
+    getTotalSecondsOfTimeFormat(timeFormat) {
+        return (((timeFormat.hours * 60) + timeFormat.minutes) * 60) + timeFormat.seconds;
+    }
     /**
      * Handler for the setInterval call which will be used as the interval for the stop watch
      *
      * @param {StopWatch} stopWatch
      * @memberof StopWatch
      */
-    DigitalClock.prototype.stopWatchIntervalHandler = function (stopWatch) {
+    stopWatchIntervalHandler(stopWatch) {
         stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval();
-    };
-    return DigitalClock;
-}());
+        this.onTimeFormatChangedHanders.forEach(handler => {
+            handler(stopWatch, stopWatch.time);
+        });
+    }
+    onTimeFormChanged(handler) {
+        this.onTimeFormatChangedHanders.push(handler);
+    }
+}
 exports.DigitalClock = DigitalClock;
-// /**
-//  * Converts the time in seconds to a TimeFormat type
-//  * If the isSeconds is false then it is assumed that they
-//  * are milliseconds and then converted to seconds
-//  *
-//  * @param {number} time
-//  * @param {boolean} [isSeconds=true]
-//  * @returns {TimeFormat}
-//  */
-// function convertTime(time: number, isSeconds: boolean = true): TimeFormat {
-//     time  = !time ? time / 1000 : time
-//     let seconds = time % 60
-//     let totalMinutes = (time - seconds) / 60
-//     let minutes = totalMinutes % 60
-//     let hours = (totalMinutes - minutes) / 60
-//     return {
-//         seconds,
-//         minutes,
-//         hours
-//     }
-// }
-// function startStopWatch(seconds: number, minutes: number, hours: number) {
-//     let totalSeconds: number = (((hours * 60) + minutes) * 60) + seconds
-//     let handle = setInterval(() => {
-//         if (totalSeconds > 0) {
-//         let time = convertTime(--totalSeconds)
-//             console.log(time)
-//         } else {
-//             clearInterval(handle)
-//         }
-//     }, 1000)
-// }
-// function startCountDownToTime(min: number, hour: number, day: number, month: number, year: number) {
-//     let now = new Date()
-//     now.setUTCMinutes(min)
-//     now.setUTCHours(hour)
-//     now.setUTCFullYear(year , month, day)
-//     let offset = now.getTimezoneOffset() * 60 * 1000
-//     let d = convertTime(Math.ceil((now.getTime() -  (new Date().getTime()) + offset) / 1000)) 
-//     console.log(d)
-//     startStopWatch(d.seconds, d.minutes, d.hours)
-// }

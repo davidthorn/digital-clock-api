@@ -1,12 +1,12 @@
-interface Project {
+interface ProjectTest {
     helloWorld(): void
 }
 
 interface Window {
-    project: Project
+    project: ProjectTest
 }
 
-class ProjectObject implements Project {
+class ProjectObject implements ProjectTest {
 
     constructor() {  }
 
@@ -19,7 +19,7 @@ class ProjectObject implements Project {
 
 }
 
-Window.prototype.project = ((): Project =>  {
+Window.prototype.project = ((): ProjectTest =>  {
     return new ProjectObject()
 })()
 
