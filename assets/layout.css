@@ -1,4 +1,45 @@
 * {
     padding: 0px;
     margin: 0px;
+    font-family: Arial, Helvetica, sans-serif;
 }
+
+body {
+    background: #111;
+    color: #5ee30a;
+    overflow: hidden;
+}
+
+
+.digital-clock {
+    display: inline-block;
+    text-align: center;
+    border: 1px solid #5ee30a;
+    padding: 0px 0px 0px 0px;
+    border-radius: 20px;
+}
+
+#digital-clock-hours {
+
+}
+
+
+ul.clock-body {
+    overflow: hidden;
+    height: 20vh;
+    width: auto;
+    border: 1px solid green;
+    border-radius: 20px;
+    margin: 10px auto 10px auto;
+    list-style-type: none;
+}
+
+ul.clock-body li {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+
