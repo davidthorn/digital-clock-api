@@ -1,5 +1,9 @@
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./digital-clock-api"));
 class DigitalClock {
     constructor(timeFormat) {
         this.onTimeFormatChangedHanders = [];
@@ -94,6 +98,7 @@ class DigitalClock {
         if (this.handle !== undefined) {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined');
         }
+        this.totalSeconds = this.getTotalSecondsOfTimeFormat(time);
         this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this);
         if (this.handle === undefined) {
             throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred');
@@ -194,7 +199,7 @@ class DigitalClock {
      */
     stopWatchIntervalHandler(stopWatch) {
         stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval();
-        this.onTimeFormatChangedHanders.forEach(handler => {
+        stopWatch.onTimeFormatChangedHanders.forEach(handler => {
             handler(stopWatch, stopWatch.time);
         });
     }

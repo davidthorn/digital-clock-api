@@ -1,5 +1,5 @@
-import { StopWatch, TimeFormat, StopWatchHandle, TypeFormChangeHandler } from './index'
-export * from './index'
+import { StopWatch, TypeFormChangeHandler,StopWatchHandle, TimeFormat } from './types'
+export * from './digital-clock-api'
 
 export class DigitalClock implements StopWatch {
 
@@ -107,7 +107,7 @@ export class DigitalClock implements StopWatch {
         if(this.handle !== undefined) {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined')
         }
-
+        this.totalSeconds = this.getTotalSecondsOfTimeFormat(time)
         this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this)
 
         if(this.handle === undefined) {
@@ -116,6 +116,7 @@ export class DigitalClock implements StopWatch {
 
         this.time = time
         this.isRunning = true
+
 
         return this.handle
     }
@@ -222,7 +223,7 @@ export class DigitalClock implements StopWatch {
      */
     stopWatchIntervalHandler(stopWatch: StopWatch ): void {
         stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval()
-        this.onTimeFormatChangedHanders.forEach(handler =>  {
+        stopWatch.onTimeFormatChangedHanders.forEach(handler =>  {
             handler(stopWatch, stopWatch.time)
         })
     }

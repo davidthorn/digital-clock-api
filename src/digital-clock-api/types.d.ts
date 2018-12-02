@@ -1,18 +1,6 @@
-import { DigitalClock } from "./digital-clock-api/digital-clock-api";
-
-export interface DigitalClockProject {
-    draw(): void
-}
-
-
-export interface Window {
-    project: DigitalClockProject 
-}
-
-
 export type StopWatchHandle = number | undefined
 
-export type TypeFormChangeHandler = (clock: DigitalClock ,  timeFormat: TimeFormat) => void 
+export type TypeFormChangeHandler = (clock: StopWatch ,  timeFormat: TimeFormat) => void 
 
 export interface StopWatch {
 

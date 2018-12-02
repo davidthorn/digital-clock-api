@@ -1,28 +1,31 @@
-interface ProjectTest {
-    helloWorld(): void
-}
+import { DigitalClock } from './digital-clock-api/digital-clock-api' 
 
-interface Window {
-    project: ProjectTest
-}
-
-class ProjectObject implements ProjectTest {
-
-    constructor() {  }
-
-    helloWorld(): void {
-        const element = document.createElement('h1')
-        let text = document.createTextNode('Hello, World!')
-        element.appendChild(text)
-        document.body.appendChild(element)
+declare global {
+    interface  Window {
+        clock: DigitalClock
+        draw(): void
     }
-
 }
 
-Window.prototype.project = ((): ProjectTest =>  {
-    return new ProjectObject()
+
+Window.prototype.clock = ((): DigitalClock =>  {
+    return new DigitalClock()
 })()
 
-window.onload = () => {
-    window.project.helloWorld()
+Window.prototype.draw = () => {
+
+    window.clock.onTimeFormChanged((c, t) => {
+        console.log(c.convertSecondsToTimeFormat(c.totalSeconds))
+    })
+
+    window.clock.startTimer({
+        seconds: 100, 
+        minutes: 0,
+        hours: 0
+    })
 }
+
+window.onload = () => {
+    
+}
+
