@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-describe("Testing other works too" , () => {
+describe("Testing that works too" , () => {
 
     it('multiplying 5 by 5' , () => {
         expect(5 * 5).to.equal(25 , 'should equal 25')
