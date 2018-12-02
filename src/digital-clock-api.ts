@@ -66,6 +66,11 @@ export class DigitalClock implements StopWatch {
      * @memberof StopWatch
      */
     decrementSeconds(): number {
+
+        if(this.totalSeconds === 0) {
+            throw new Error(`Totals seconds is 0, cannot decrement 0`)
+        }
+
         return --this.totalSeconds
     }
 
