@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var DigitalClock = /** @class */ (function () {
     function DigitalClock(timeFormat) {
         /**
@@ -55,6 +55,26 @@ var DigitalClock = /** @class */ (function () {
         this.time = timeFormat;
     }
     /**
+     * Should decrement the totalSeconds by 1 and then return totalSeconds
+     * new value
+     *
+     * @returns {number}
+     * @memberof StopWatch
+     */
+    DigitalClock.prototype.decrementSeconds = function () {
+        return --this.totalSeconds;
+    };
+    /**
+     * Indicates if the stop watch / timer is running
+     * Returns true if totalSeconds is more than 0 and false otherwise
+     *
+     * @returns {boolean}
+     * @memberof StopWatch
+     */
+    DigitalClock.prototype.running = function () {
+        return this.totalSeconds > 0;
+    };
+    /**
      * Should set the isTimer property to true
      * and set the time property to hold the time value
      * The timer should then start
@@ -67,7 +87,14 @@ var DigitalClock = /** @class */ (function () {
      * @memberof StopWatch
      */
     DigitalClock.prototype.startTimer = function (time) {
-        throw new Error('Not yet implemented');
+        if (this.handle === undefined) {
+            throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined');
+        }
+        this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this);
+        if (this.handle === undefined) {
+            throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred');
+        }
+        return this.handle;
     };
     /**
      * Should stop the timer from running
@@ -83,6 +110,20 @@ var DigitalClock = /** @class */ (function () {
      */
     DigitalClock.prototype.stopTimer = function () {
         throw new Error('Not yet implemented');
+    };
+    /**
+    * Should stop the interval running if it is already running
+    * This method will throw an error if the interval is not running
+    * The handle property must be undefined after calling this method
+    *
+    * @memberof StopWatch
+    */
+    DigitalClock.prototype.clearInterval = function () {
+        if (this.handle === undefined) {
+            throw new Error('The interval must be running for it to be stoppped');
+        }
+        clearInterval(this.handle);
+        this.handle = undefined;
     };
     /**
      * Converts the total number of seconds provided into a TimeFormat
@@ -119,6 +160,15 @@ var DigitalClock = /** @class */ (function () {
      */
     DigitalClock.prototype.getTotalSecondsOfTimeFormat = function (timeFormat) {
         throw new Error('Not yet implemented');
+    };
+    /**
+     * Handler for the setInterval call which will be used as the interval for the stop watch
+     *
+     * @param {StopWatch} stopWatch
+     * @memberof StopWatch
+     */
+    DigitalClock.prototype.stopWatchIntervalHandler = function (stopWatch) {
+        stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval();
     };
     return DigitalClock;
 }());
