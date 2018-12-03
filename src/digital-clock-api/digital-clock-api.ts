@@ -87,7 +87,7 @@ export class DigitalClock implements StopWatch {
      * @memberof StopWatch
      */
     running(): boolean {
-        return this.totalSeconds > 0
+        return this.totalSeconds > 0 && this.handle !== undefined
     }
 
     /**

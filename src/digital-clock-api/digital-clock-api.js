@@ -52,6 +52,8 @@ class DigitalClock {
          * @memberof StopWatch
          */
         this.handle = undefined;
+        this.frames = 0;
+        this.lastFrame = Date.now();
         if (timeFormat === undefined)
             return;
         if (timeFormat.seconds < 0 || timeFormat.hours < 0 || timeFormat.hours < 0) {
@@ -80,7 +82,7 @@ class DigitalClock {
      * @memberof StopWatch
      */
     running() {
-        return this.totalSeconds > 0;
+        return this.totalSeconds > 0 && this.handle !== undefined;
     }
     /**
      * Should set the isTimer property to true
@@ -99,12 +101,13 @@ class DigitalClock {
             throw new Error('A timer is already runnning because a handle has been set. The previous interval must be stop prior to calling this method again. Once the interval has been stopped this property must be set to undefined');
         }
         this.totalSeconds = this.getTotalSecondsOfTimeFormat(time);
-        this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this);
+        //this.handle = setInterval(this.stopWatchIntervalHandler, 1000, this)
+        this.time = time;
+        this.isRunning = true;
+        this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this));
         if (this.handle === undefined) {
             throw new Error('The handle is undefined after calling setInterval, unexpected error has occurred');
         }
-        this.time = time;
-        this.isRunning = true;
         return this.handle;
     }
     /**
@@ -138,7 +141,8 @@ class DigitalClock {
         if (this.handle === undefined) {
             throw new Error('The interval must be running for it to be stoppped');
         }
-        clearInterval(this.handle);
+        cancelAnimationFrame(this.handle);
+        //clearInterval(this.handle)
         this.handle = undefined;
     }
     /**
@@ -150,10 +154,10 @@ class DigitalClock {
      * @memberof StopWatch
      */
     convertSecondsToTimeFormat(totalSeconds) {
-        let seconds = totalSeconds % 60; // gives the remaining seconds
-        let totalMinutes = (totalSeconds - seconds) / 60; // gives the total number of minutes
-        let minutes = totalMinutes % 60; // gives the remaining number of minutes
-        let hours = (totalMinutes - minutes) / 60; // calculates the number of hours 
+        let seconds = Math.ceil(totalSeconds % 60); // gives the remaining seconds
+        let totalMinutes = Math.ceil((totalSeconds - seconds) / 60); // gives the total number of minutes
+        let minutes = Math.ceil(totalMinutes % 60); // gives the remaining number of minutes
+        let hours = Math.ceil((totalMinutes - minutes) / 60); // calculates the number of hours 
         return {
             seconds,
             minutes,
@@ -194,14 +198,28 @@ class DigitalClock {
     /**
      * Handler for the setInterval call which will be used as the interval for the stop watch
      *
-     * @param {StopWatch} stopWatch
      * @memberof StopWatch
      */
-    stopWatchIntervalHandler(stopWatch) {
-        stopWatch.running() ? stopWatch.decrementSeconds() : stopWatch.clearInterval();
-        stopWatch.onTimeFormatChangedHanders.forEach(handler => {
-            handler(stopWatch, stopWatch.time);
+    stopWatchIntervalHandler() {
+        if (this.frames < 60) {
+            this.frames++;
+            if (this.handle) {
+                this.clearInterval();
+            }
+            this.lastFrame = Date.now();
+            this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this));
+            return;
+        }
+        this.frames = 0;
+        this.running() ? this.decrementSeconds() : this.clearInterval();
+        this.onTimeFormatChangedHanders.forEach(handler => {
+            handler(this, this.time);
         });
+        if (this.handle) {
+            this.clearInterval();
+        }
+        this.lastFrame = Date.now();
+        this.handle = requestAnimationFrame(this.stopWatchIntervalHandler.bind(this));
     }
     onTimeFormChanged(handler) {
         this.onTimeFormatChangedHanders.push(handler);
